@@ -1,5 +1,5 @@
 module.exports = {
-    entry: './js/entry.js',
+    entry: './js/demo/entry.js',
 
     output: {
         path: './assets/built',
