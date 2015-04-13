@@ -24,6 +24,8 @@ class SquareContext {
             new THREE.PlaneGeometry(squareWidth, squareHeight),
             new THREE.ShaderMaterial({
                 uniforms: {
+                    screenWidth:  { type: 'f', value: width  },
+                    screenHeight: { type: 'f', value: height },
                     domainX: { type: 'v2', value: new THREE.Vector2(domain.x[0], domain.x[1]) },
                     domainY: { type: 'v2', value: new THREE.Vector2(domain.y[0], domain.y[1]) }
                 },
@@ -60,17 +62,18 @@ vec4 domcol(vec2 z) {
     return vec4(hsv2rgb(hsv), 1.0);
 }
 
-uniform vec2 domainX;
-uniform vec2 domainY;
+uniform float screenWidth;
+uniform float screenHeight;
+uniform vec2 domainX, domainY;
 
 float scale(float t, float start, float end) {
-    return t * end + (1.0 - t) * start;
+    return (1.0 - t) * start + t * end;
 }
 
 void main() {
     vec2 z = vec2(
-        scale(gl_FragCoord.x, domainX.x, domainX.y),
-        scale(gl_FragCoord.y, domainY.x, domainY.y)
+        scale(gl_FragCoord.x / screenWidth, domainX.x, domainX.y),
+        scale(gl_FragCoord.y / screenHeight, domainY.x, domainY.y)
     );
 
     gl_FragColor = domcol(f(z));
