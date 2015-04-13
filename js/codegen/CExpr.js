@@ -34,7 +34,7 @@ class CExpr {
     compile() {
         const [a, b] = this.fold(
             ['z.x', 'z.y'],
-            (a, b) => [a.toString(), b.toString()],
+            (a, b) => [a.toExponential(), b.toExponential()],
             ([a, b], [c, d]) => {
                 return [`${a} + ${c}`, `${b} + ${d}`];
             },

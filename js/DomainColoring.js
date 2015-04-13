@@ -22,7 +22,7 @@ class DomainColoring extends React.Component {
 }
 
 DomainColoring.propTypes = {
-    func:   React.PropTypes.string,
+    func:   React.PropTypes.string.isRequired,
     width:  React.PropTypes.number,
     height: React.PropTypes.number,
     domain: React.PropTypes.shape({

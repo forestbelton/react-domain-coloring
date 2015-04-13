@@ -1,7 +1,8 @@
 import THREE from './three.min.js';
+import Parser from './codegen/Parser';
 
 class SquareContext {
-    constructor(width, height) {
+    constructor(width, height, func) {
         const VIEW_ANGLE = 45, ASPECT = width / height, NEAR = 0.1, FAR = 10000;
 
         this.renderer = new THREE.WebGLRenderer();
@@ -15,6 +16,9 @@ class SquareContext {
         const squareHeight = 2 * Math.tan(this.camera.fov / 2) * 150,
             squareWidth  = squareHeight * this.camera.aspect;
 
+        // compile expression to GLSL function
+        const compiled = Parser.parse(func).value.compile();
+
         // set up square with the proper coloring
         this.square = new THREE.Mesh(
             new THREE.PlaneGeometry(squareWidth, squareHeight),
@@ -26,6 +30,8 @@ void main() {
         * vec4(position, 1.0);
 }`,
                 fragmentShader: `
+${compiled}
+
 #define PI 3.14159265358979323846
 
 // http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
@@ -52,7 +58,7 @@ vec4 domcol(vec2 z) {
 
 void main() {
     vec2 z       = vec2(gl_FragCoord.x, gl_FragCoord.y);
-    gl_FragColor = domcol(z);
+    gl_FragColor = domcol(f(z));
 }`
             })
         );
