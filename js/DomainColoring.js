@@ -40,9 +40,14 @@ DomainColoring.propTypes = {
     width:  React.PropTypes.number,
     height: React.PropTypes.number,
     domain: React.PropTypes.shape({
-        x: React.PropTypes.arrayOf(React.PropTypes.number),
-        y: React.PropTypes.arrayOf(React.PropTypes.number),
-    })
+        x: React.PropTypes.arrayOf(React.PropTypes.number).isRequired,
+        y: React.PropTypes.arrayOf(React.PropTypes.number).isRequired,
+    }).isRequired
+};
+
+DomainColoring.defaultProps = {
+    width:  300,
+    height: 300
 };
 
 module.exports = DomainColoring;
