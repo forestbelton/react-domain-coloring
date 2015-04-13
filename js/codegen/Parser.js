@@ -63,4 +63,4 @@ var pow_expr = chainr1(token('^'), term),
     mul_expr = chainl1(token('*').or(token('/')), pow_expr),
     add_expr = chainl1(token('+').or(token('-')), mul_expr);
 
-module.exports = add_expr;
+module.exports = ws.then(add_expr).skip(ws);

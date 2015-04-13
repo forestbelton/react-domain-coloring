@@ -2,6 +2,15 @@ import React from 'react';
 import SquareContext from './SquareContext';
 
 class DomainColoring extends React.Component {
+    draw() {
+        try {
+            this.state.ctx.draw(this.props.func, this.props.domain);
+            this.state.ctx.render();
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
     componentDidMount() {
         var ctx = new SquareContext(
             this.props.width,
@@ -10,11 +19,15 @@ class DomainColoring extends React.Component {
             this.props.domain
         );
 
-        React.findDOMNode(this).appendChild(
-            ctx.getDOMNode()
-        );
+        React.findDOMNode(this).appendChild(ctx.getDOMNode());
 
-        ctx.render();
+        this.setState({
+            ctx: ctx
+        });
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        this.draw();
     }
 
     render() {

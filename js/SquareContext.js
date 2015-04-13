@@ -2,8 +2,11 @@ import THREE from './three.min.js';
 import Parser from './codegen/Parser';
 
 class SquareContext {
-    constructor(width, height, func, domain) {
+    constructor(width, height) {
         const VIEW_ANGLE = 45, ASPECT = width / height, NEAR = 0.1, FAR = 10000;
+
+        this.width  = width;
+        this.height = height;
 
         this.renderer = new THREE.WebGLRenderer();
         this.scene    = new THREE.Scene();
@@ -12,20 +15,35 @@ class SquareContext {
         // pull camera back
         this.camera.position.z = 10;
 
+        this.scene.add(this.camera);
+        this.renderer.setSize(width, height);
+    }
+
+    // TODO: When the input changes, only update material instead of recreating
+    // the square
+    draw(func, domain) {
+        // compile expression to GLSL function
+        const parseResult = Parser.parse(func);
+        if(parseResult.status == false) {
+            throw new Error('Parse error');
+        }
+        const compiled = parseResult.value.compile();
+
+        if(this.square) {
+            this.scene.remove(this.square);
+        }
+
         // compute square width/height to fit perfectly in view frustum
         const squareHeight = 2 * Math.tan(this.camera.fov / 2) * 150,
             squareWidth  = squareHeight * this.camera.aspect;
-
-        // compile expression to GLSL function
-        const compiled = Parser.parse(func).value.compile();
 
         // set up square with the proper coloring
         this.square = new THREE.Mesh(
             new THREE.PlaneGeometry(squareWidth, squareHeight),
             new THREE.ShaderMaterial({
                 uniforms: {
-                    screenWidth:  { type: 'f', value: width  },
-                    screenHeight: { type: 'f', value: height },
+                    screenWidth:  { type: 'f', value: this.width  },
+                    screenHeight: { type: 'f', value: this.height },
                     domainX: { type: 'v2', value: new THREE.Vector2(domain.x[0], domain.x[1]) },
                     domainY: { type: 'v2', value: new THREE.Vector2(domain.y[0], domain.y[1]) }
                 },
@@ -51,17 +69,9 @@ vec3 hsv2rgb(vec3 c)
 }
 
 vec4 domcol(vec2 z) {
-    float hue = fract(atan(z.y, z.x) / (2.0 * PI) + 1.0);
-
-    float r = length(z);
-    float val = fract(log2(r));
-
-    vec3 hsv = vec3(hue, 1.0, val);
-    return vec4(hsv2rgb(hsv), 1.0);
-
 /* Alternative coloring, found at
  * http://mathematica.stackexchange.com/a/7359
-
+ */
     float h = 0.5 + cx_arg(z) / (2.0 * PI);
     float s = abs(sin(2.0 * PI * cx_abs(z)));
 
@@ -70,7 +80,6 @@ vec4 domcol(vec2 z) {
 
     vec3 hsv = vec3(h, sqrt(s), b2);
     return vec4(hsv2rgb(hsv), 1.0);
-*/
 }
 
 uniform float screenWidth;
@@ -93,9 +102,6 @@ void main() {
         );
 
         this.scene.add(this.square);
-        this.scene.add(this.camera);
-
-        this.renderer.setSize(width, height);
     }
 
     getDOMNode() {
