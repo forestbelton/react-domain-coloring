@@ -1,8 +1,7 @@
-import SquareContext from './SquareContext';
+import React from 'react';
+import DomainColoring from './DomainColoring';
 
-var sc = new SquareContext(500, 500);
-document.body.appendChild(sc.getDOMNode());
-sc.render();
-
-import CExpr from './CExpr';
-window.CExpr = CExpr;
+React.render(
+    <DomainColoring width={300} height={300} />,
+    document.body
+);

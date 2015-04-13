@@ -2,7 +2,7 @@
   "name": "react-domain-coloring",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./js/DomainColoring.js",
   "scripts": {
     "start": "./node_modules/.bin/webpack-dev-server --content-base assets/ --hot --config webpack-development.config.js",
     "build": "./node_modules/.bin/webpack --config webpack-production.config.js",
@@ -13,10 +13,10 @@
   "devDependencies": {
     "babel-core": "^5.0.12",
     "babel-loader": "^5.0.0",
+    "react": "^0.13.1",
     "script-loader": "^0.6.1",
     "webpack": "^1.8.4",
     "webpack-dev-server": "^1.8.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
