@@ -2,7 +2,7 @@ import THREE from './three.min.js';
 import Parser from './codegen/Parser';
 
 class SquareContext {
-    constructor(width, height, func) {
+    constructor(width, height, func, domain) {
         const VIEW_ANGLE = 45, ASPECT = width / height, NEAR = 0.1, FAR = 10000;
 
         this.renderer = new THREE.WebGLRenderer();
@@ -23,6 +23,10 @@ class SquareContext {
         this.square = new THREE.Mesh(
             new THREE.PlaneGeometry(squareWidth, squareHeight),
             new THREE.ShaderMaterial({
+                uniforms: {
+                    domainX: { type: 'v2', value: new THREE.Vector2(domain.x[0], domain.x[1]) },
+                    domainY: { type: 'v2', value: new THREE.Vector2(domain.y[0], domain.y[1]) }
+                },
                 vertexShader: `
 void main() {
     gl_Position = projectionMatrix
@@ -56,8 +60,19 @@ vec4 domcol(vec2 z) {
     return vec4(hsv2rgb(hsv), 1.0);
 }
 
+uniform vec2 domainX;
+uniform vec2 domainY;
+
+float scale(float t, float start, float end) {
+    return t * end + (1.0 - t) * start;
+}
+
 void main() {
-    vec2 z       = vec2(gl_FragCoord.x, gl_FragCoord.y);
+    vec2 z = vec2(
+        scale(gl_FragCoord.x, domainX.x, domainX.y),
+        scale(gl_FragCoord.y, domainY.x, domainY.y)
+    );
+
     gl_FragColor = domcol(f(z));
 }`
             })

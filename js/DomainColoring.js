@@ -6,7 +6,8 @@ class DomainColoring extends React.Component {
         var ctx = new SquareContext(
             this.props.width,
             this.props.height,
-            this.props.func
+            this.props.func,
+            this.props.domain
         );
 
         React.findDOMNode(this).appendChild(
