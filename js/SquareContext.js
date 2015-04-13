@@ -39,6 +39,8 @@ void main() {
 ${compiled}
 
 #define PI 3.14159265358979323846
+#define cx_arg(z) atan(z.y, z.x)
+#define cx_abs(z) length(z)
 
 // http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
 vec3 hsv2rgb(vec3 c)
@@ -48,18 +50,27 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-// http://nbviewer.ipython.org/github/empet/Math/blob/master/DomainColoring.ipynb
-// H = (arg(z) / 2π + 1) mod 1
-// S = 1
-// V = (1 - 1/(|z|^2))^0.2
 vec4 domcol(vec2 z) {
-    float hue = mod(atan(z.y, z.x) / (2.0 * PI) + 1.0, 1.0);
+    float hue = fract(atan(z.y, z.x) / (2.0 * PI) + 1.0);
 
-    float modz = length(z);
-    float val  = pow(1.0 - 1.0 / (1.0 + modz * modz), 0.2);
+    float r = length(z);
+    float val = fract(log2(r));
 
     vec3 hsv = vec3(hue, 1.0, val);
     return vec4(hsv2rgb(hsv), 1.0);
+
+/* Alternative coloring, found at
+ * http://mathematica.stackexchange.com/a/7359
+
+    float h = 0.5 + cx_arg(z) / (2.0 * PI);
+    float s = abs(sin(2.0 * PI * cx_abs(z)));
+
+    float b  = abs(sin(2.0 * PI * z.y)) * pow(sin(2.0 * PI * z.x), 0.25);
+    float b2 = 0.5 * ((1.0 - s) + b + sqrt((1.0 - s - b) * (1.0 - s - b) + 0.01));
+
+    vec3 hsv = vec3(h, sqrt(s), b2);
+    return vec4(hsv2rgb(hsv), 1.0);
+*/
 }
 
 uniform float screenWidth;
