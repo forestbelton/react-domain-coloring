@@ -1,15 +1,19 @@
 import P from 'parsimmon';
 import CExpr from './CExpr';
 
+var ws = P.regex(/[ \r\t\n]*/);
+
 function token(str) {
-    return P.string(str).skip(P.regex(/[ \r\t\n]*/));
+    return P.string(str).skip(ws);
 }
 
 var term = P.lazy(() =>
     P.alt(
         token('z').result(CExpr.Var()),
         token('i').result(CExpr.Constant(0, 1)),
-        token('(').then(add_expr).skip(token(')'))
+        token('(').then(add_expr).skip(token(')')),
+        P.regex(/-?[0-9][0-9]*(\.[0-9]+)?/).skip(ws)
+            .map((n) => CExpr.Constant(parseFloat(n), 0))
     )
 );
 
