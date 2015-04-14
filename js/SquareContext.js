@@ -86,14 +86,10 @@ uniform float screenWidth;
 uniform float screenHeight;
 uniform vec2 domainX, domainY;
 
-float scale(float t, float start, float end) {
-    return (1.0 - t) * start + t * end;
-}
-
 void main() {
     vec2 z = vec2(
-        scale(gl_FragCoord.x / screenWidth, domainX.x, domainX.y),
-        scale(gl_FragCoord.y / screenHeight, domainY.x, domainY.y)
+        mix(domainX.x, domainX.y, gl_FragCoord.x / screenWidth),
+        mix(domainY.x, domainY.y, gl_FragCoord.y / screenHeight)
     );
 
     gl_FragColor = domcol(f(z));
