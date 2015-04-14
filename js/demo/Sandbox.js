@@ -1,7 +1,7 @@
 import React from 'react';
 import DomainColoring from '../DomainColoring';
 
-class Sandbox extends React.Component {
+export default class Sandbox extends React.Component {
     constructor(props) {
         super(props);
 
@@ -47,7 +47,3 @@ class Sandbox extends React.Component {
         );
     }
 }
-
-module.exports = Sandbox;
-
-

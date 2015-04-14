@@ -1,4 +1,4 @@
-class CExpr {
+export default class CExpr {
     constructor(runFold) {
         this.runFold = runFold;
     }
@@ -46,5 +46,3 @@ class CExpr {
         return `vec2 f(vec2 z) { return vec2(${a}, ${b}); }`;
     }
 }
-
-module.exports = CExpr;

@@ -1,7 +1,7 @@
 import React from 'react';
 import SquareContext from './SquareContext';
 
-class DomainColoring extends React.Component {
+export default class DomainColoring extends React.Component {
     draw() {
         try {
             this.state.ctx.draw(this.props.func, this.props.domain);
@@ -49,5 +49,3 @@ DomainColoring.defaultProps = {
     width:  300,
     height: 300
 };
-
-module.exports = DomainColoring;

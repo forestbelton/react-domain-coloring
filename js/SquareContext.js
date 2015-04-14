@@ -1,7 +1,7 @@
 import THREE from './three.min.js';
 import Parser from './codegen/Parser';
 
-class SquareContext {
+export default class SquareContext {
     constructor(width, height) {
         const VIEW_ANGLE = 45, ASPECT = width / height, NEAR = 0.1, FAR = 10000;
 
@@ -108,5 +108,3 @@ void main() {
         this.renderer.render(this.scene, this.camera);
     }
 }
-
-module.exports = SquareContext
