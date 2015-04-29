@@ -72,11 +72,12 @@ vec4 domcol(vec2 z) {
 /* Alternative coloring, found at
  * http://mathematica.stackexchange.com/a/7359
  */
-    float h = 0.5 + cx_arg(z) / (2.0 * PI);
+ //These changes are to match Farris' domain coloring look and feel. (Very ratchet changes that will be over written by photograph upload)
+    float h = /*0.5 + */ cx_arg(z) / (2.0 * PI);
     float s = abs(sin(2.0 * PI * cx_abs(z)));
 
-    float b  = abs(sin(2.0 * PI * z.y)) * pow(sin(2.0 * PI * z.x), 0.25);
-    float b2 = 0.5 * ((1.0 - s) + b + sqrt((1.0 - s - b) * (1.0 - s - b) + 0.01));
+    float b  = abs(sin(2.0 * PI * z.y)); //* pow(sin(2.0 * PI * z.x), 0.25);
+    float b2 = 0.99; //0.5 * ((1.0 - s) + b + sqrt((1.0 - s - b) * (1.0 - s - b) + 0.01));
 
     vec3 hsv = vec3(h, sqrt(s), b2);
     return vec4(hsv2rgb(hsv), 1.0);
