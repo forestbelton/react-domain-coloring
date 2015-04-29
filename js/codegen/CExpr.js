@@ -3,31 +3,43 @@ export default class CExpr {
         this.runFold = runFold;
     }
 
-    fold(x, f, g, h) {
-        return this.runFold(x, f, g, h);
+    fold(x, f, g, h, i, j) {
+        return this.runFold(x, f, g, h, i, j);
     }
 
     static Var() {
-        return new CExpr((x, f, g, h) => {
+        return new CExpr((x, f, g, h, i, j) => {
             return x;
         });
     };
 
     static Constant(a, b) {
-        return new CExpr((x, f, g, h) => {
+        return new CExpr((x, f, g, h, i, j) => {
             return f(a, b);
         });
     }
 
     static Add(z, w) {
-        return new CExpr((x, f, g, h) => {
-            return g(z.fold(x, f, g, h), w.fold(x, f, g, h));
+        return new CExpr((x, f, g, h, i, j) => {
+            return g(z.fold(x, f, g, h, i, j), w.fold(x, f, g, h, i, j));
         });
     }
 
     static Mul(z, w) {
-        return new CExpr((x, f, g, h) => {
-            return h(z.fold(x, f, g, h), w.fold(x, f, g, h));
+        return new CExpr((x, f, g, h, i, j) => {
+            return h(z.fold(x, f, g, h, i, j), w.fold(x, f, g, h, i, j));
+        });
+    }
+
+    static Sub(z, w) {
+        return new CExpr((x, f, g, h, i, j) => {
+            return i(z.fold(x, f, g, h, i, j), w.fold(x, f, g, h, i, j));
+        });
+    }
+
+    static Div(z, w) {
+        return new CExpr((x, f, g, h, i, j) => {
+            return j(z.fold(x, f, g, h, i, j), w.fold(x, f, g, h, i, j));
         });
     }
 
@@ -40,6 +52,12 @@ export default class CExpr {
             },
             ([a, b], [c, d]) => {
                 return [`${a} * ${c} - ${b} * ${d}`, `${a} * ${d} + ${b} * ${c}`];
+            },
+            ([a, b], [c, d]) => {
+                return [`${a} - ${c}`, `${b} - ${d}`];
+            },
+            ([a, b], [c, d]) => {
+                return [`${a} * ${c} + ${b} * ${d} / ${c} * ${c} + ${d} * ${d}`, `${b} * ${c} - ${a} * ${d} / ${c} * ${c} + ${d} * ${d}`];
             }
         );
 

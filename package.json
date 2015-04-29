@@ -20,5 +20,7 @@
     "webpack": "^1.8.4",
     "webpack-dev-server": "^1.8.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "react-dropzone": "^1.0.1"
+  }
 }

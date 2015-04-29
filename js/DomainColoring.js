@@ -61,6 +61,6 @@ DomainColoring.propTypes = {
 };
 
 DomainColoring.defaultProps = {
-    width:  300,
-    height: 300
+    width:  500,
+    height: 500
 };
