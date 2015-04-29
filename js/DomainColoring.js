@@ -16,7 +16,8 @@ class DomainColoring extends React.Component {
             this.props.width,
             this.props.height,
             this.props.func,
-            this.props.domain
+            this.props.domain,
+            this.props.image
         );
 
         React.findDOMNode(this).appendChild(ctx.getDOMNode());
@@ -24,6 +25,14 @@ class DomainColoring extends React.Component {
         this.setState({
             ctx: ctx
         });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (!this.state.ctx) {
+            return ;
+        }
+
+        this.state.ctx.update(nextProps.image);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -46,8 +55,8 @@ DomainColoring.propTypes = {
 };
 
 DomainColoring.defaultProps = {
-    width:  300,
-    height: 300
+    width:  500,
+    height: 500
 };
 
 module.exports = DomainColoring;

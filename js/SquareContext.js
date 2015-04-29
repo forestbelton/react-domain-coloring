@@ -12,11 +12,17 @@ class SquareContext {
         this.scene    = new THREE.Scene();
         this.camera   = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
 
+        this.update();
+
         // pull camera back
         this.camera.position.z = 10;
 
         this.scene.add(this.camera);
         this.renderer.setSize(width, height);
+    }
+
+    update(image) {
+        this.image = image ? THREE.ImageUtils.loadTexture( image ) : THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xff00ff ) );
     }
 
     // TODO: When the input changes, only update material instead of recreating
@@ -42,6 +48,7 @@ class SquareContext {
             new THREE.PlaneGeometry(squareWidth, squareHeight),
             new THREE.ShaderMaterial({
                 uniforms: {
+                    texture: { type: "t", value: this.image },
                     screenWidth:  { type: 'f', value: this.width  },
                     screenHeight: { type: 'f', value: this.height },
                     domainX: { type: 'v2', value: new THREE.Vector2(domain.x[0], domain.x[1]) },
@@ -60,31 +67,37 @@ ${compiled}
 #define cx_arg(z) atan(z.y, z.x)
 #define cx_abs(z) length(z)
 
-// http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
-vec3 hsv2rgb(vec3 c)
-{
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
-
-vec4 domcol(vec2 z) {
-/* Alternative coloring, found at
- * http://mathematica.stackexchange.com/a/7359
- */
-    float h = 0.5 + cx_arg(z) / (2.0 * PI);
-    float s = abs(sin(2.0 * PI * cx_abs(z)));
-
-    float b  = abs(sin(2.0 * PI * z.y)) * pow(sin(2.0 * PI * z.x), 0.25);
-    float b2 = 0.5 * ((1.0 - s) + b + sqrt((1.0 - s - b) * (1.0 - s - b) + 0.01));
-
-    vec3 hsv = vec3(h, sqrt(s), b2);
-    return vec4(hsv2rgb(hsv), 1.0);
-}
-
+uniform sampler2D texture;
 uniform float screenWidth;
 uniform float screenHeight;
 uniform vec2 domainX, domainY;
+
+// http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
+// Keep for later
+// vec3 hsv2rgb(vec3 c)
+// {
+//     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+//     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+//     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+// }
+
+vec4 domcol(vec2 z) {
+    return texture2D(texture, z);
+
+    //z --> sampler which the sampler gets the color from pic using coords
+/* Alternative coloring, found at
+ * http://mathematica.stackexchange.com/a/7359
+ */
+ //These changes are to match Farris' domain coloring look and feel. (Very ratchet changes that will be over written by photograph upload) Keep this for later
+    // float h = /*0.5 + */ cx_arg(z) / (2.0 * PI);
+    // float s = abs(sin(2.0 * PI * cx_abs(z)));
+
+    // float b  = abs(sin(2.0 * PI * z.y)); //* pow(sin(2.0 * PI * z.x), 0.25);
+    // float b2 = 0.99; //0.5 * ((1.0 - s) + b + sqrt((1.0 - s - b) * (1.0 - s - b) + 0.01));
+
+    // vec3 hsv = vec3(h, sqrt(s), b2);
+    // return vec4(hsv2rgb(hsv), 1.0);
+}
 
 float scale(float t, float start, float end) {
     return (1.0 - t) * start + t * end;
