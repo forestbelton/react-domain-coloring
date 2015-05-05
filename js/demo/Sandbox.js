@@ -67,7 +67,7 @@ class Sandbox extends React.Component {
                   <div>Try dropping some files here, or click to select files to upload.</div>
                 </Dropzone>
 
-                { this.state.imageURI ? <img src={this.state.imageURI} width = "500px" /> : null }
+                { this.state.imageURI ? <img src={this.state.imageURI} width = "500pt" height = "500pt" /> : null }
             </div>
         );
     }

@@ -51,6 +51,7 @@ class SquareContext {
                     texture: { type: "t", value: this.image },
                     screenWidth:  { type: 'f', value: this.width  },
                     screenHeight: { type: 'f', value: this.height },
+                    //Revisit this to see why we aren't putting in the
                     domainX: { type: 'v2', value: new THREE.Vector2(domain.x[0], domain.x[1]) },
                     domainY: { type: 'v2', value: new THREE.Vector2(domain.y[0], domain.y[1]) }
                 },
@@ -72,31 +73,14 @@ uniform float screenWidth;
 uniform float screenHeight;
 uniform vec2 domainX, domainY;
 
-// http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
-// Keep for later
-// vec3 hsv2rgb(vec3 c)
-// {
-//     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-//     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-//     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-// }
+// vec3 darkenCorners(vec3 col) {
+//     float distFromMiddle = distance(gl_FragCoord, vec2(0.5, 0.5));
+//     col.rgb *= 1.7 * (0.8 - distFromMiddle);
+//     return col;
+// } 
 
 vec4 domcol(vec2 z) {
     return texture2D(texture, z);
-
-    //z --> sampler which the sampler gets the color from pic using coords
-/* Alternative coloring, found at
- * http://mathematica.stackexchange.com/a/7359
- */
- //These changes are to match Farris' domain coloring look and feel. (Very ratchet changes that will be over written by photograph upload) Keep this for later
-    // float h = /*0.5 + */ cx_arg(z) / (2.0 * PI);
-    // float s = abs(sin(2.0 * PI * cx_abs(z)));
-
-    // float b  = abs(sin(2.0 * PI * z.y)); //* pow(sin(2.0 * PI * z.x), 0.25);
-    // float b2 = 0.99; //0.5 * ((1.0 - s) + b + sqrt((1.0 - s - b) * (1.0 - s - b) + 0.01));
-
-    // vec3 hsv = vec3(h, sqrt(s), b2);
-    // return vec4(hsv2rgb(hsv), 1.0);
 }
 
 float scale(float t, float start, float end) {
