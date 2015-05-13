@@ -1,0 +1,137 @@
+.menu {
+  list-style: none;
+  /* Important for sizing problems when you add/remove the submenus 
+   Make it use 100% of the size of your container */
+  width: 100%;
+  /* This prevents a lot of problems with the submenus. 
+   UL have basic padding, keep that in mind */
+  padding: 0;
+}
+
+.menu li {
+  /* I wanted mine horizontal. Feel free to change it to what you want */
+  display:inline-block;
+  /* Float the items to the left, to make sure the disposition does not change when it shows the subitems */
+  float:left;
+  /* The -1px on top and right make it so that our borders end up above one another
+     Not needed it you don't have borders... */
+  margin:-1px -1px 0 0;
+}
+
+.menu li a {
+  display:block;
+
+
+  /* My basic styling. I'm just giving them a black text, with a black border, and center the text in the box. */
+  text-decoration:none;
+  border: 1px solid black;
+  vertical-align: middle;
+  text-align: center;
+
+  /* Fixed size is also just me. 
+     Not fixing it just make huge boxes when you have submenus */
+  width:100px;
+  height:50px;
+  line-height: 50px;
+}
+
+.menu li > ul {
+/****** THE INTERESTING PART ******/
+/* We hide the submenus by putting them somewhere on the left, with no opacity. */
+  left:-9999px;
+  opacity: 0;
+
+/* We make transitions on opacity */
+  -webkit-transiton: opacity 0.3s;
+  -moz-transition: opacity 0.3s;
+  -ms-transition: opacity 0.3s;
+  -o-transition: opacity 0.3s;
+  transition: opacity 0.3s;
+}
+
+.menu li:hover > ul {
+/* On hover, we get it back to its basic spot
+  left:0;
+/* And change the opacity to a fully visible one */
+  opacity: 1;
+};
+
+
+body {
+    background-color: #2d2d2d;
+    font-family: 'Lato';
+    color: white;
+    font-weight: 300;
+}
+
+h1 {
+    font-weight: 300;
+    text-transform: uppercase;
+    font-size: 42px;
+    color: #FFFFFF;
+}
+
+.navigation {
+    width: 200px;
+    text-transform: uppercase;
+    float: right;
+}
+
+.navigation ul {
+    background-color: #37383a;
+    cursor: pointer;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.navigation .header {
+    padding: 15px;
+    background-color: #4e5053;
+}
+
+.navigation li {
+    padding: 15px;
+}
+
+.navigation .selected {
+    background-color: #9061b2;
+}
+
+.score {
+    font-size: 36px;
+    margin: 15px;
+    color: #afb3b9;
+}
+
+.title {
+    font-size: 18px;
+}
+
+.title a {
+    text-decoration: none;
+    color: #fff;
+}
+
+.author {
+    font-size: 16px;
+}
+
+/**
+ * Changed to a <b> because React wraps text nodes in
+ * <span> elements if they have non-text-node siblings.
+ */
+.author b {
+    color: #afb3b9;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  background: #D3D3D3;
+}
+
+b {
+  color: #FFFFFF;
+}

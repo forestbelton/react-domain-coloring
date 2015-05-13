@@ -1,75 +1,33 @@
 import THREE from './three.min.js';
 import Parser from './codegen/Parser';
 
-export default class SquareContext {
-    constructor(options) {
-        const VIEW_ANGLE = 45,
-              ASPECT = options.width / options.height,
-              NEAR = 0.1,
-              FAR = 10000;
+class SquareContext {
+    constructor(width, height) {
+        const VIEW_ANGLE = 45, ASPECT = width / height, NEAR = 0.1, FAR = 10000;
+
+        this.width  = width;
+        this.height = height;
 
         this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setSize(options.width, options.height);
+        this.scene    = new THREE.Scene();
+        this.camera   = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
 
-        this.scene = new THREE.Scene();
+        this.update();
 
-        this.camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+        // pull camera back
         this.camera.position.z = 10;
+
         this.scene.add(this.camera);
-
-        // compute square width/height to fit perfectly in view frustum
-        const squareHeight = 2 * Math.tan(this.camera.fov / 2) * 150,
-              squareWidth  = squareHeight * this.camera.aspect;
-
-        // set up square with the proper coloring
-        this.square = new THREE.Mesh(
-            new THREE.PlaneGeometry(squareWidth, squareHeight),
-            new THREE.ShaderMaterial({
-                uniforms: {
-                    screenWidth:  { type: 'f', value: options.width  },
-                    screenHeight: { type: 'f', value: options.height },
-                    domainX: { type: 'v2', value: new THREE.Vector2(options.domain.x[0], options.domain.x[1]) },
-                    domainY: { type: 'v2', value: new THREE.Vector2(options.domain.y[0], options.domain.y[1]) }
-                },
-                vertexShader: `
-                void main() {
-                    gl_Position = projectionMatrix
-                        * modelViewMatrix
-                        * vec4(position, 1.0);
-
-                }`,
-                fragmentShader: this.buildFragmentShader(options.func)
-            })
-        );
-
-        this.scene.add(this.square);
-    }
-
-    setSize(width, height) {
-        this.square.material.uniforms.screenWidth.value  = width;
-        this.square.material.uniforms.screenHeight.value = height;
-
         this.renderer.setSize(width, height);
     }
 
-    setDomain(domain) {
-        this.square.material.uniforms.domainX.value = new THREE.Vector2(
-            domain.x[0],
-            domain.x[1]
-        );
-
-        this.square.material.uniforms.domainY.value = new THREE.Vector2(
-            domain.y[0],
-            domain.y[1]
-        );
+    update(image) {
+        this.image = image ? THREE.ImageUtils.loadTexture( image ) : THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xff00ff ) );
     }
 
-    setFunc(func) {
-        this.square.material.fragmentShader = this.buildFragmentShader(func);
-        this.square.material.needsUpdate = true;
-    }
-
-    buildFragmentShader(func) {
+    // TODO: When the input changes, only update material instead of recreating
+    // the square
+    draw(func, domain) {
         // compile expression to GLSL function
         const parseResult = Parser.parse(func);
         if(parseResult.status == false) {
@@ -77,47 +35,70 @@ export default class SquareContext {
         }
         const compiled = parseResult.value.compile();
 
-        return `
+        if(this.square) {
+            this.scene.remove(this.square);
+        }
+
+        // compute square width/height to fit perfectly in view frustum
+        const squareHeight = 2 * Math.tan(this.camera.fov / 2) * 150,
+            squareWidth  = squareHeight * this.camera.aspect;
+
+        // set up square with the proper coloring
+        this.square = new THREE.Mesh(
+            new THREE.PlaneGeometry(squareWidth, squareHeight),
+            new THREE.ShaderMaterial({
+                uniforms: {
+                    texture: { type: "t", value: this.image },
+                    screenWidth:  { type: 'f', value: this.width  },
+                    screenHeight: { type: 'f', value: this.height },
+                    //Revisit this to see why we aren't putting in the
+                    domainX: { type: 'v2', value: new THREE.Vector2(domain.x[0], domain.x[1]) },
+                    domainY: { type: 'v2', value: new THREE.Vector2(domain.y[0], domain.y[1]) }
+                },
+                vertexShader: `
+void main() {
+    gl_Position = projectionMatrix
+        * modelViewMatrix
+        * vec4(position, 1.0);
+}`,
+                fragmentShader: `
 ${compiled}
 
 #define PI 3.14159265358979323846
 #define cx_arg(z) atan(z.y, z.x)
 #define cx_abs(z) length(z)
 
-// http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
-vec3 hsv2rgb(vec3 c)
-{
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
-
-vec4 domcol(vec2 z) {
-/* Alternative coloring, found at
- * http://mathematica.stackexchange.com/a/7359
- */
-    float h = 0.5 + cx_arg(z) / (2.0 * PI);
-    float s = abs(sin(2.0 * PI * cx_abs(z)));
-
-    float b  = abs(sin(2.0 * PI * z.y)) * pow(sin(2.0 * PI * z.x), 0.25);
-    float b2 = 0.5 * ((1.0 - s) + b + sqrt((1.0 - s - b) * (1.0 - s - b) + 0.01));
-
-    vec3 hsv = vec3(h, sqrt(s), b2);
-    return vec4(hsv2rgb(hsv), 1.0);
-}
-
+uniform sampler2D texture;
 uniform float screenWidth;
 uniform float screenHeight;
 uniform vec2 domainX, domainY;
 
+// vec3 darkenCorners(vec3 col) {
+//     float distFromMiddle = distance(gl_FragCoord, vec2(0.5, 0.5));
+//     col.rgb *= 1.7 * (0.8 - distFromMiddle);
+//     return col;
+// } 
+
+vec4 domcol(vec2 z) {
+    return texture2D(texture, z);
+}
+
+float scale(float t, float start, float end) {
+    return (1.0 - t) * start + t * end;
+}
+
 void main() {
     vec2 z = vec2(
-        mix(domainX.x, domainX.y, gl_FragCoord.x / screenWidth),
-        mix(domainY.x, domainY.y, gl_FragCoord.y / screenHeight)
+        scale(gl_FragCoord.x / screenWidth, domainX.x, domainX.y),
+        scale(gl_FragCoord.y / screenHeight, domainY.x, domainY.y)
     );
 
     gl_FragColor = domcol(f(z));
-}`;
+}`
+            })
+        );
+
+        this.scene.add(this.square);
     }
 
     getDOMNode() {
@@ -127,4 +108,6 @@ void main() {
     render() {
         this.renderer.render(this.scene, this.camera);
     }
-};
+}
+
+module.exports = SquareContext
