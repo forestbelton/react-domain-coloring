@@ -35,13 +35,13 @@ export default class CExpr {
 
     compile() {
 	const mul = ([a, b], [c, d]) => 
-            [`${a} * ${c} - ${b} * ${d}`, `${a} * ${d} + ${b} * ${c}`];	
+            [`(${a} * ${c} - ${b} * ${d})`, `(${a} * ${d} + ${b} * ${c})`];
 
         const [a, b] = this.fold(
             ['z.x', 'z.y'],
             (a, b) => [a.toExponential(), b.toExponential()],
             ([a, b], [c, d]) => {
-                return [`${a} + ${c}`, `${b} + ${d}`];
+                return [`(${a} + ${c})`, `(${b} + ${d})`];
             },
             (z, w) => {
                 return mul(z, w);
