@@ -59,8 +59,16 @@ function chainr1(op, p) {
     ).map(([l, r]) => rassoc(l, r));
 }
 
-var pow_expr = chainr1(token('^'), term),
-    mul_expr = chainl1(token('*').or(token('/')), pow_expr),
+var pow_expr = P.alt(
+    P.seq(
+        term,
+        token('^'),
+        P.regex(/[0-9]+/)
+    ).map(([l, op, r]) => binop(op, l, parseInt(r, 10))),
+    term
+);
+
+var mul_expr = chainl1(token('*').or(token('/')), pow_expr),
     add_expr = chainl1(token('+').or(token('-')), mul_expr);
 
 export default ws.then(add_expr).skip(ws);
