@@ -1,6 +1,6 @@
 import P from 'parsimmon';
 
-import Compiler from '../../purs/Compiler.purs';
+import Complex from '../../purs/Complex.purs';
 
 var ws = P.regex(/[ \r\t\n]*/);
 
@@ -10,25 +10,25 @@ function token(str) {
 
 var term = P.lazy(() =>
     P.alt(
-        token('z').result(new Compiler.Var),
-        token('i').result(new Compiler.Val(0, 1)),
-        P.seq(
+        token('z').result(Complex.variable),
+        token('i').result(Complex.complex(0)(1)),
+        /*        P.seq(
             P.regex(/[a-z]+/),
             token('(').then(add_expr).skip(token(')'))
-        ).map(([name, expr]) => new Compiler.Call(name, expr)),
+            ).map(([name, expr]) => new Complex.Complex(Compiler.Call(name, expr)),*/
         token('(').then(add_expr).skip(token(')')),
         P.regex(/-?[0-9][0-9]*(\.[0-9]+)?/).skip(ws)
-            .map((n) => new Compiler.Val(parseFloat(n), 0))
+            .map((n) => Complex.complex(parseFloat(n))(0))
     )
 );
 
 function binop(o, l, r) {
     switch(o) {
-        case '+': return new Compiler.BinOp(new Compiler.Add, l, r);
-        case '-': return new Compiler.BinOp(new Compiler.Sub, l, r);
-        case '*': return new Compiler.BinOp(new Compiler.Mul, l, r);
-        case '/': return new Compiler.BinOp(new Compiler.Div, l, r);
-        //        case '^': return CExpr.Pow(l, r);
+        case '+': return Complex.cAdd(l)(r);
+        case '-': return Complex.cSub(l)(r);
+        case '*': return Complex.cMul(l)(r);
+        case '/': return Complex.cDiv(l)(r);
+        //        case '^': return new Compiler.BinOp(new Compiler.Pow, l, r);
     }
 }
 
@@ -64,16 +64,8 @@ function chainr1(op, p) {
     ).map(([l, r]) => rassoc(l, r));
 }
 
-var pow_expr = P.alt(
-    P.seq(
-        term,
-        token('^'),
-        P.regex(/[0-9]+/)
-    ).map(([l, op, r]) => binop(op, l, parseInt(r, 10))),
-    term
-);
-
-var mul_expr = chainl1(token('*').or(token('/')), pow_expr),
+var pow_expr = chainr1(token('^'), term),
+    mul_expr = chainl1(token('*').or(token('/')), pow_expr),
     add_expr = chainl1(token('+').or(token('-')), mul_expr);
 
 export default ws.then(add_expr).skip(ws);

@@ -76,26 +76,9 @@ export default class SquareContext {
         if(parseResult.status == false) {
             throw new Error('Parse error');
         }
-        const compiled = Compiler.glsl(parseResult.value);
+        const compiled = Compiler.compile(parseResult.value);
 
         return `
-vec2 cx_add(vec2 z, vec2 w) {
-    return vec2(z.x + w.x, z.y + w.y);
-}
-
-vec2 cx_sub(vec2 z, vec2 w) {
-    return vec2(z.x - w.x, z.y - w.y);
-}
-
-vec2 cx_mul(vec2 z, vec2 w) {
-    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
-}
-
-vec2 cx_div(vec2 z, vec2 w) {
-    float denom = w.x * w.x + w.y * w.y;
-    return vec2((z.x * w.x + z.y * w.y) / denom, (z.y * w.x - z.x * w.y) / denom);
-}
-
 float sinh(float x) {
     return (1.0 - exp(-2.0 * x)) / (2.0 * exp(-x));
 }

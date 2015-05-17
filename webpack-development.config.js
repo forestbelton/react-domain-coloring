@@ -13,7 +13,7 @@ module.exports = {
         loaders: [
             { test: /\.json$/, loader: 'json-loader' },
             { test: /\.js$/, loader: 'babel-loader', exclude: /three\.min\.js/ },
-            { test: /\.purs$/, loader: 'purs-loader?output=purs_output&src[]=purs&noPrelude' }
+            { test: /\.purs$/, loader: 'purs-loader?noPrelude&output=purs_output&src[]=purs' }
         ]
     },
 
