@@ -96,6 +96,22 @@ vec2 cx_div(vec2 z, vec2 w) {
     return vec2((z.x * w.x + z.y * w.y) / denom, (z.y * w.x - z.x * w.y) / denom);
 }
 
+float sinh(float x) {
+    return (1.0 - exp(-2.0 * x)) / (2.0 * exp(-x));
+}
+
+float cosh(float x) {
+    return (1.0 + exp(-2.0 * x)) / (2.0 * exp(-x));
+}
+
+vec2 cx_sin(vec2 z) {
+    return vec2(sin(z.x) * cosh(z.y), cos(z.x) * sinh(z.y));
+}
+
+vec2 cx_cos(vec2 z) {
+    return vec2(cos(z.x) * cosh(z.y), -sin(z.x) * sinh(z.y));
+}
+
 vec2 f(vec2 z) {
     return ${compiled};
 }

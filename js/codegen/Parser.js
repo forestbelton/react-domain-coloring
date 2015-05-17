@@ -12,6 +12,10 @@ var term = P.lazy(() =>
     P.alt(
         token('z').result(new Compiler.Var),
         token('i').result(new Compiler.Val(0, 1)),
+        P.seq(
+            P.regex(/[a-z]+/),
+            token('(').then(add_expr).skip(token(')'))
+        ).map(([name, expr]) => new Compiler.Call(name, expr)),
         token('(').then(add_expr).skip(token(')')),
         P.regex(/-?[0-9][0-9]*(\.[0-9]+)?/).skip(ws)
             .map((n) => new Compiler.Val(parseFloat(n), 0))
