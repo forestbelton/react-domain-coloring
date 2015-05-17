@@ -10,7 +10,8 @@ glslOpName Mul = "*"
 glslOpName Div = "/"
 
 glslOp :: Op -> String -> String -> String
-glslOp op l r = "(" ++ l ++ glslOpName op ++ r ++ ")"
+glslOp Pow l r = "pow(" ++ l ++ "," ++ r ++ ")"
+glslOp op  l r = "(" ++ l ++ glslOpName op ++ r ++ ")"
 
 glslCall :: String -> String -> String
 glslCall name arg = name ++ "(" ++ arg ++ ")"

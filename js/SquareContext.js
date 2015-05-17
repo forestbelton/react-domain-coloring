@@ -76,6 +76,7 @@ export default class SquareContext {
         if(parseResult.status == false) {
             throw new Error('Parse error');
         }
+
         const compiled = Compiler.compile(parseResult.value);
 
         return `

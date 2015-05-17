@@ -1,4 +1,4 @@
-module Complex (Complex(..), foldComplex, cAdd, cSub, cMul, cDiv, cCall, complex, variable) where
+module Complex (Complex(..), foldComplex, cAdd, cSub, cMul, cDiv, cPow, cCall, complex, variable) where
 
 import Term
 
@@ -16,6 +16,11 @@ cMul (Complex a b) (Complex c d) = Complex (a * c - b * d) (b * c + a * d)
 cDiv :: Complex Term -> Complex Term -> Complex Term
 cDiv (Complex a b) (Complex c d) = Complex ((a * c + b * d) / denom) ((b * c - a * d) / denom)
     where denom = c * c + d * d
+
+cPow :: Complex Term -> Complex Term -> Complex Term
+cPow (Complex (Constant x) (Constant 0)) (Complex a b) = Complex (factor * Call "cos" inner) (factor * Call "sin" inner)
+    where factor = BinOp Pow (Constant x) a
+          inner  = b * Call "log" (Constant x)
 
 cCall :: String -> Complex Term -> Complex Term
 cCall "sin" (Complex a b) = Complex ((Call "sin" a) * (Call "cosh" b)) ((Call "cos" a) * (Call "sinh" b))

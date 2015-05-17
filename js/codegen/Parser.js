@@ -28,7 +28,7 @@ function binop(o, l, r) {
         case '-': return Complex.cSub(l)(r);
         case '*': return Complex.cMul(l)(r);
         case '/': return Complex.cDiv(l)(r);
-        //        case '^': return new Compiler.BinOp(new Compiler.Pow, l, r);
+        case '^': return Complex.cPow(l)(r);
     }
 }
 
@@ -53,7 +53,7 @@ function rassoc(l, r) {
         return l;
     }
 
-    const x = r.shift(), [t, o] = x;
+    const x = r.shift(), [o, t] = x;
     return binop(o, l, rassoc(t, r));
 }
 

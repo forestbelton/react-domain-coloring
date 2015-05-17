@@ -1,6 +1,6 @@
 module Term (Op(..), Term(..), foldTerm) where
 
-data Op = Add | Sub | Mul | Div
+data Op = Add | Sub | Mul | Div | Pow
 
 -- An expression type for a single component in a complex number
 --
