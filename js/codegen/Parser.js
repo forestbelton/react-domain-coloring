@@ -12,6 +12,7 @@ var term = P.lazy(() =>
     P.alt(
         token('z').result(Complex.variable),
         token('i').result(Complex.complex(0)(1)),
+        token('e').result(Complex.complex(Math.E)(0)),
         P.seq(
             P.regex(/[a-z]+/),
             token('(').then(add_expr).skip(token(')'))
