@@ -12,10 +12,10 @@ var term = P.lazy(() =>
     P.alt(
         token('z').result(Complex.variable),
         token('i').result(Complex.complex(0)(1)),
-        /*        P.seq(
+        P.seq(
             P.regex(/[a-z]+/),
             token('(').then(add_expr).skip(token(')'))
-            ).map(([name, expr]) => new Complex.Complex(Compiler.Call(name, expr)),*/
+        ).map(([name, expr]) => Complex.cCall(name)(expr)),
         token('(').then(add_expr).skip(token(')')),
         P.regex(/-?[0-9][0-9]*(\.[0-9]+)?/).skip(ws)
             .map((n) => Complex.complex(parseFloat(n))(0))

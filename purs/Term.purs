@@ -10,6 +10,7 @@ data Term = RPart
           | IPart
           | Constant Number
           | BinOp Op Term Term
+          | Call String Term
 
 instance semiringTerm :: Semiring Term where
     zero = Constant 0
@@ -28,10 +29,11 @@ foldTerm :: forall a. a
     -> a
     -> (Number -> a)
     -> (Op -> a -> a -> a)
+    -> (String -> a -> a)
     -> Term
     -> a
-foldTerm x y f g RPart          = x
-foldTerm x y f g IPart          = y
-foldTerm x y f g (Constant n)   = f n
-foldTerm x y f g (BinOp op l r) = g op (foldTerm x y f g l) (foldTerm x y f g r)
-
+foldTerm x y f g h RPart          = x
+foldTerm x y f g h IPart          = y
+foldTerm x y f g h (Constant n)   = f n
+foldTerm x y f g h (BinOp op l r) = g op (foldTerm x y f g h l) (foldTerm x y f g h r)
+foldTerm x y f g h (Call n t)     = h n (foldTerm x y f g h t)

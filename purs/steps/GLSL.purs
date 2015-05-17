@@ -12,6 +12,9 @@ glslOpName Div = "/"
 glslOp :: Op -> String -> String -> String
 glslOp op l r = "(" ++ l ++ glslOpName op ++ r ++ ")"
 
+glslCall :: String -> String -> String
+glslCall name arg = name ++ "(" ++ arg ++ ")"
+
 foreign import toExponential
 """
 function toExponential(x) {
@@ -20,6 +23,6 @@ function toExponential(x) {
 """ :: Number -> String
 
 glsl :: Complex Term -> String
-glsl term = case foldComplex "z.x" "z.y" toExponential glslOp term of
+glsl term = case foldComplex "z.x" "z.y" toExponential glslOp glslCall term of
     Complex a b -> "vec2(" ++ a ++ "," ++ b ++ ")"
 
