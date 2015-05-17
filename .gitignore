@@ -5,3 +5,4 @@ purs_output/
 .cabal-sandbox/
 cabal.sandbox.config
 npm-debug.log
+.psci_modules/
