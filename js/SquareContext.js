@@ -1,5 +1,6 @@
 import THREE from './three.min.js';
 import Parser from './codegen/Parser';
+import Compiler from '../purs/Compiler.purs';
 
 export default class SquareContext {
     constructor(options) {
@@ -75,10 +76,29 @@ export default class SquareContext {
         if(parseResult.status == false) {
             throw new Error('Parse error');
         }
-        const compiled = parseResult.value.compile();
+        const compiled = Compiler.glsl(parseResult.value);
 
         return `
-${compiled}
+vec2 cx_add(vec2 z, vec2 w) {
+    return vec2(z.x + w.x, z.y + w.y);
+}
+
+vec2 cx_sub(vec2 z, vec2 w) {
+    return vec2(z.x - w.x, z.y - w.y);
+}
+
+vec2 cx_mul(vec2 z, vec2 w) {
+    return vec2(z.x * w.x - z.y * w.y, z.x * w.y + z.y * w.x);
+}
+
+vec2 cx_div(vec2 z, vec2 w) {
+    float denom = w.x * w.x + w.y * w.y;
+    return vec2((z.x * w.x + z.y * w.y) / denom, (z.y * w.x - z.x * w.y) / denom);
+}
+
+vec2 f(vec2 z) {
+    return ${compiled};
+}
 
 #define PI 3.14159265358979323846
 #define cx_arg(z) atan(z.y, z.x)

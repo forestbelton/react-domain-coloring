@@ -15,6 +15,7 @@
     "babel-loader": "^5.0.0",
     "json-loader": "^0.5.1",
     "parsimmon": "^0.7.0",
+    "purs-loader": "^0.2.1",
     "react": "^0.13.1",
     "script-loader": "^0.6.1",
     "webpack": "^1.8.4",

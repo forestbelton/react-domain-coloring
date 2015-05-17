@@ -1,5 +1,6 @@
 import P from 'parsimmon';
-import CExpr from './CExpr';
+
+import Compiler from '../../purs/Compiler.purs';
 
 var ws = P.regex(/[ \r\t\n]*/);
 
@@ -9,21 +10,21 @@ function token(str) {
 
 var term = P.lazy(() =>
     P.alt(
-        token('z').result(CExpr.Var()),
-        token('i').result(CExpr.Constant(0, 1)),
+        token('z').result(new Compiler.Var),
+        token('i').result(new Compiler.Val(0, 1)),
         token('(').then(add_expr).skip(token(')')),
         P.regex(/-?[0-9][0-9]*(\.[0-9]+)?/).skip(ws)
-            .map((n) => CExpr.Constant(parseFloat(n), 0))
+            .map((n) => new Compiler.Val(parseFloat(n), 0))
     )
 );
 
 function binop(o, l, r) {
     switch(o) {
-        case '+': return CExpr.Add(l, r);
-        case '-': return CExpr.Sub(l, r);
-        case '*': return CExpr.Mul(l, r);
-        case '/': return CExpr.Div(l, r);
-        case '^': return CExpr.Pow(l, r);
+        case '+': return new Compiler.BinOp(new Compiler.Add, l, r);
+        case '-': return new Compiler.BinOp(new Compiler.Sub, l, r);
+        case '*': return new Compiler.BinOp(new Compiler.Mul, l, r);
+        case '/': return new Compiler.BinOp(new Compiler.Div, l, r);
+        //        case '^': return CExpr.Pow(l, r);
     }
 }
 
